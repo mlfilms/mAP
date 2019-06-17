@@ -3,19 +3,20 @@ import glob
 import os
 import sys
 import json
+import imp
 
 def validateCFG(cfg):
 
-    truthPath = cfg['darkflow']["validation_truth_path"]) #should be xml
-    detectionPath = os.path.abspath(config["validation_detection_path"]) #should be .json
-    mAPPath = os.path.abspath(config["mAPPath"]) #path to your map folder
+    truthPath = os.path.join(cfg['temp']['rootDir'],cfg['validation']["validation_truth_path"]) #should be xml
+    detectionPath = os.path.join(cfg['temp']['rootDir'],cfg['validation']["validation_detection_path"]) #should be .json
+    mAPPath = os.path.join(cfg['temp']['rootDir'],cfg['paths']["validation"]) #path to your map folder
 
 
-    mAPTruthPath = os.path.join(mAPPath,"input\\ground-truth\\")
+    mAPTruthPath = os.path.join(mAPPath,"input/ground-truth/")
     #os.path.abspath("C:/Users/Eric Minor/TrackingML/defectTracker/mAP/input/ground-truth/")
-    mAPDetectionPath = os.path.join(mAPPath,"input\\detection-results\\")
+    mAPDetectionPath = os.path.join(mAPPath,"input/detection-results/")
     #os.path.abspath("C:/Users/Eric Minor/TrackingML/defectTracker/mAP/input/detection-results")
-    mAPScriptsPath = os.path.join(mAPPath, "scripts\\extra\\")
+    mAPScriptsPath = os.path.join(mAPPath, "scripts/extra/")
 
 
     def wipeFolder(folder):
@@ -35,11 +36,13 @@ def validateCFG(cfg):
 
 
     filePattern = 	os.path.join(truthPath,"*.xml")
+    #print(os.getcwd())
+    #print(filePattern)
     #print(filePattern)
     for filename in glob.glob(filePattern):
         drive,pathAndFile = os.path.splitdrive(filename)
-        path, file = os.path.split(pathAndFile)
-        newFilename = os.path.join(mAPTruthPath,file)
+        path, xmlFile = os.path.split(pathAndFile)
+        newFilename = os.path.join(mAPTruthPath,xmlFile)
         shutil.copyfile(filename,newFilename)
         #print(filename)
         
@@ -48,25 +51,40 @@ def validateCFG(cfg):
     #print(filePattern)
     for filename in glob.glob(filePattern):
         drive,pathAndFile = os.path.splitdrive(filename)
-        path, file = os.path.split(pathAndFile)
-        newFilename = os.path.join(mAPDetectionPath,file)
+        path, JSONFile = os.path.split(pathAndFile)
+        newFilename = os.path.join(mAPDetectionPath,JSONFile)
         shutil.copyfile(filename,newFilename)
         
     sys.path.append(mAPScriptsPath)
     os.chdir(mAPScriptsPath)
-    print(os.getcwd())
-    from convert_dr_darkflow_jsonF import convertJSON
-    from convert_gt_xmlF import convertXML
-    convertJSON()
-    convertXML()
+    #print(os.getcwd())
+    #from convert_dr_darkflow_jsonF import convertJSON
+    #from convert_gt_xmlF import convertXML
+    #convertJSON()
+    #convertXML()
+
+
+    
+    sim = imp.load_source('packages', os.path.join(mAPScriptsPath,'convert_dr_darkflow_jsonF.py'))
+    method = getattr(sim,'convertJSON')
+    method()
+
+    sim = imp.load_source('packages', os.path.join(mAPScriptsPath,'convert_gt_xmlF.py'))
+    method = getattr(sim,'convertXML')
+    method()
 
     sys.path.append(mAPPath)
     os.chdir(mAPPath)
 
-    from mAPValDist import mAPVal
+    #from mAPValDist import mAPVal
+    #print("end Val")
+    sim = imp.load_source('packages', os.path.join(mAPPath,'mAPValDist.py'))
+    method = getattr(sim,'mAPVal')
+    method(20)
+    
 
-    mAPVal(20)
-
+    #mAPVal(20)
+    
 
 
 

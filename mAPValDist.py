@@ -9,18 +9,27 @@ import math
 
 import numpy as np
 
+class fakeArgs:
+    def __init__(self,animation,plot,quiet,ignore,iou):
+        self.no_animation = animation
+        self.no_plot = plot
+        self.quiet = quiet
+        self.ignore = ignore
+        self.set_class_iou = iou
+
 def mAPVal(matchDist):
     MINOVERLAP = 0.5 # default value (defined in the PASCAL VOC2012 challenge)
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true")
-    parser.add_argument('-np', '--no-plot', help="no plot is shown.", action="store_true")
-    parser.add_argument('-q', '--quiet', help="minimalistic console output.", action="store_true")
+    #parser = argparse.ArgumentParser()
+    #parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true",default='True')
+    #parser.add_argument('-np', '--no-plot', help="no plot is shown.", action="store_true",default='True')
+    #parser.add_argument('-q', '--quiet', help="minimalistic console output.", action="store_true")
     # argparse receiving list of classes to be ignored
-    parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
+    #parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
     # argparse receiving list of classes with specific IoU (e.g., python main.py --set-class-iou person 0.7)
-    parser.add_argument('--set-class-iou', nargs='+', type=str, help="set IoU for a specific class.")
-    args = parser.parse_args()
+    #parser.add_argument('--set-class-iou', nargs='+', type=str, help="set IoU for a specific class.")
+    #args = parser.parse_args()
+    args = fakeArgs(True,True,True,"","")
 
     '''
         0,0 ------> x (width)
