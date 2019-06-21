@@ -12,7 +12,7 @@ import numpy as np
 class fakeArgs:
     def __init__(self,animation,plot,quiet,ignore,iou):
         self.no_animation = animation
-        self.no_plot = plot
+        self.no_plot = False
         self.quiet = quiet
         self.ignore = ignore
         self.set_class_iou = iou
