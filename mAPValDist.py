@@ -496,7 +496,9 @@ def mAPVal(matchDist):
                     bounding_boxes.append({"confidence":confidence, "file_id":file_id, "bbox":bbox})
                     #print(bounding_boxes)
         # sort detection-results by decreasing confidence
+        
         bounding_boxes.sort(key=lambda x:float(x['confidence']), reverse=True)
+        xC = [a["confidence"] for a in bounding_boxes]
         with open(TEMP_FILES_PATH + "/" + class_name + "_dr.json", 'w') as outfile:
             json.dump(bounding_boxes, outfile)
 
@@ -850,6 +852,20 @@ def mAPVal(matchDist):
     """
      Write number of detected objects per class to results.txt
     """
+    xC = np.array([float(con) for con in xC])
+    rounded_prec = np.array([float(precI) for precI in prec])
+    rounded_rec = np.array([float(recI) for recI in rec])
+    f1 = np.power(np.true_divide(np.add(np.power(rounded_prec,-1), np.power(rounded_rec,-1)),2),-1)
+    maxInd = np.argmax(f1)
+    bestThresh = xC[maxInd]
+
+
+    #f1 = np.array([((prec**-1+rec**-1)/2)**-1 for rec in rounded_rec for prec in rounded_prec])
+
+    allData = np.array([rounded_prec,rounded_rec,xC,f1])
+    allData = allData.T
+    np.savetxt(os.path.join('results','confidence.txt'),allData)
+    
     with open(results_files_path + "/results.txt", 'a') as results_file:
         results_file.write("\n# Number of detected objects per class\n")
         for class_name in sorted(dr_classes):
@@ -857,7 +873,12 @@ def mAPVal(matchDist):
             text = class_name + ": " + str(n_det)
             text += " (tp:" + str(count_true_positives[class_name]) + ""
             text += ", fp:" + str(n_det - count_true_positives[class_name]) + ")\n"
+            text += "Best Threshold: " + str(bestThresh) + "\n"
             results_file.write(text)
+
+    #output precision, recall, threshold
+    #allData = np.concatenate((rounded_prec,rounded_rec,xC),axis=1)
+    #print(xC)
 
     """
      Draw log-average miss rate plot (Show lamr of all classes in decreasing order)
@@ -889,7 +910,7 @@ def mAPVal(matchDist):
         plot_title = "mAP = {0:.2f}%".format(mAP*100)
         x_label = "Average Precision"
         output_path = results_files_path + "/mAP.png"
-        to_show = True
+        to_show = False
         plot_color = 'royalblue'
         draw_plot_func(
             ap_dictionary,
