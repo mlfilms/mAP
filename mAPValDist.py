@@ -858,13 +858,16 @@ def mAPVal(matchDist):
     f1 = np.power(np.true_divide(np.add(np.power(rounded_prec,-1), np.power(rounded_rec,-1)),2),-1)
     maxInd = np.argmax(f1)
     bestThresh = xC[maxInd]
-
+    bestPrec = rounded_prec[maxInd]
+    bestRec = rounded_rec[maxInd]
+    bestf1 = f1[maxInd]
 
     #f1 = np.array([((prec**-1+rec**-1)/2)**-1 for rec in rounded_rec for prec in rounded_prec])
-
+    measures = np.array([bestThresh,bestPrec,bestRec,bestf1,mAP])
     allData = np.array([rounded_prec,rounded_rec,xC,f1])
     allData = allData.T
     np.savetxt(os.path.join('results','confidence.txt'),allData)
+    np.savetxt(os.path.join('results','measures.txt'),measures,delimiter =' ', header='Threshold Precision Recall f1 mAP')
     
     with open(results_files_path + "/results.txt", 'a') as results_file:
         results_file.write("\n# Number of detected objects per class\n")
